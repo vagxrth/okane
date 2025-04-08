@@ -5,25 +5,26 @@ import { User } from '@/app/api/db';
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { email, password, name } = await req.json();
 
-    // Find user by email
-    const user = await User.findOne({ email });
-    if (!user) {
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
+        { error: 'Email already registered' },
+        { status: 400 }
       );
     }
 
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      );
-    }
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Create new user
+    const user = await User.create({
+      email,
+      password: hashedPassword,
+      name
+    });
 
     // Create JWT token
     const token = jwt.sign(
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
 
     const response = NextResponse.json(
       { success: true, user: { id: user._id, email: user.email, name: user.name } },
-      { status: 200 }
+      { status: 201 }
     );
 
     // Set HTTP-only cookie
