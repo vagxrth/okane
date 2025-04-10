@@ -2,11 +2,14 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '@/app/api/db';
+import { parse } from 'cookie';
 
 export async function PATCH(req: Request) {
   try {
-    // Get the token from cookies
-    const token = req.headers.get('cookie')?.split('token=')[1]?.split(';')[0];
+    // Get the token from cookies using cookie parser
+    const cookies = parse(req.headers.get('cookie') || '');
+    const token = cookies.token;
+
     if (!token) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -31,7 +34,10 @@ export async function PATCH(req: Request) {
     }
 
     // Prepare update object
-    const updateData: any = {};
+    const updateData: {
+      password?: string;
+      name?: string;
+    } = {};
     
     // Update password if provided
     if (password) {
@@ -53,6 +59,13 @@ export async function PATCH(req: Request) {
       updateData,
       { new: true }
     );
+
+    if (!updatedUser) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
