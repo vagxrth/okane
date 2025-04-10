@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User } from '@/app/api/db';
+import { User, Account } from '@/app/api/db';
 
 export async function POST(req: Request) {
   try {
@@ -26,6 +26,13 @@ export async function POST(req: Request) {
       name
     });
 
+    // Create account with random balance (in paise)
+    const randomBalanceInPaise = Math.floor(Math.random() * (1000000 - 100 + 1)) + 100; // Random number between 100 and 1000000
+    await Account.create({
+      userId: user._id,
+      balance: randomBalanceInPaise
+    });
+
     // Create JWT token
     const token = jwt.sign(
       { userId: user._id },
@@ -34,7 +41,15 @@ export async function POST(req: Request) {
     );
 
     const response = NextResponse.json(
-      { success: true, user: { id: user._id, email: user.email, name: user.name } },
+      { 
+        success: true, 
+        user: { 
+          id: user._id, 
+          email: user.email, 
+          name: user.name 
+        },
+        initialBalance: randomBalanceInPaise / 100 // Convert paise to rupees for response
+      },
       { status: 201 }
     );
 
