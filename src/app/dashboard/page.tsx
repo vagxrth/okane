@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
 interface User {
   id: string;
   name: string;
@@ -87,7 +85,6 @@ function TransferModal({ isOpen, onClose, recipient, onTransfer }: TransferModal
 }
 
 export default function Dashboard() {
-  const router = useRouter();
   const [balance, setBalance] = useState<number>(0);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
