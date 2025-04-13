@@ -1,67 +1,49 @@
 import mongoose from 'mongoose';
 
+if (!process.env.MONGODB_URI) {
+  console.error('Error: MONGODB_URI environment variable is not defined.');
+  process.exit(1);
+}
 const MONGODB_URI = process.env.MONGODB_URI;
-if (!MONGODB_URI) {
-  throw new Error('Please define MONGODB_URI in your environment variables');
-}
 
-if (!mongoose.connections[0].readyState) {
-  mongoose.connect(MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch((err) => console.error('MongoDB connection error:', err));
-}
-
+// Mongoose schemas
 const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true
-  },
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: true
-  }
-}, {
-  timestamps: true
-});
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
+}, { timestamps: true });
 
-// Account schema for storing user balances
 const accountSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    unique: true
-  },
-  // Balance stored as integer representing paise (1/100th of a rupee)
-  // For example: 3333 represents ₹33.33
-  balance: {
-    type: Number,
-    required: true,
-    default: 0,
-    // Add validation to ensure balance is always a non-negative integer
-    validate: {
-      validator: function(value: number) {
-        return Number.isInteger(value) && value >= 0;
-      },
-      message: 'Balance must be a non-negative integer'
-    }
-  }
-}, {
-  timestamps: true
-});
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  balance: { type: Number, default: 0 }, // Store balance in paise/cents
+  currency: { type: String, default: 'INR' }
+}, { timestamps: true });
 
-// Add index on userId for faster queries
+// Indexes
+userSchema.index({ email: 1 });
 accountSchema.index({ userId: 1 });
 
-export const User = mongoose.model('User', userSchema);
-export const Account = mongoose.model('Account', accountSchema);
+// Check if models are already defined
+export const User = mongoose.models.User || mongoose.model('User', userSchema);
+export const Account = mongoose.models.Account || mongoose.model('Account', accountSchema);
+
+// Database connection
+const connectDB = async () => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      console.log('Already connected to MongoDB');
+      return;
+    }
+
+    await mongoose.connect(MONGODB_URI);
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
+};
+
+// Call connectDB but don't wait for it
+connectDB();
 
 export const connection = mongoose.connection;
