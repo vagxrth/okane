@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI!;
+if (!process.env.MONGODB_URI) {
+  console.error('Error: MONGODB_URI environment variable is not defined.');
+  process.exit(1);
+}
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // Mongoose schemas
 const userSchema = new mongoose.Schema({
