@@ -129,7 +129,7 @@ export default function Dashboard() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        recipientId: selectedUser.id,
+        to: selectedUser.id,
         amount,
       }),
     });
