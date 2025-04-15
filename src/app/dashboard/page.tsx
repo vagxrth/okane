@@ -123,6 +123,7 @@ export default function Dashboard() {
       setUsers(usersData.users);
       setLoading(false);
     } catch (err) {
+      console.error('Error fetching dashboard data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
       setLoading(false);
     }
