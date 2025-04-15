@@ -161,8 +161,8 @@ export default function Dashboard() {
 
       await fetchDashboardData();
     } catch (err) {
-      throw err;
-    }
+      setError(err instanceof Error ? err.message : 'Transfer failed');
+      setLoading(false);
   };
 
   if (loading) {
