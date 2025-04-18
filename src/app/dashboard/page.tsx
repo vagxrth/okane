@@ -134,6 +134,9 @@ export default function Dashboard() {
     if (!selectedUser) return;
 
     try {
+      setLoading(true);
+      setError('');
+
       const response = await fetch('/api/transfer', {
         method: 'POST',
         headers: {
@@ -146,14 +149,13 @@ export default function Dashboard() {
         cache: 'no-store'
       });
 
-      const data = await response.json();
-
       if (response.status === 401) {
         router.push('/signin');
         return;
       }
 
       if (!response.ok) {
+        const data = await response.json();
         throw new Error(data.error || 'Transfer failed');
       }
 
