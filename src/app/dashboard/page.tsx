@@ -4,10 +4,6 @@ import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useRouter } from 'next/navigation';
 
-// Force client-side rendering
-export const runtime = 'edge';
-export const preferredRegion = 'auto';
-
 interface User {
   id: string;
   name: string;
@@ -134,7 +130,7 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleTransfer = async (amount: number) => {
+  const handleTransfer = async (amount: number): Promise<void> => {
     if (!selectedUser) return;
 
     try {
@@ -150,13 +146,14 @@ export default function Dashboard() {
         cache: 'no-store'
       });
 
+      const data = await response.json();
+
       if (response.status === 401) {
         router.push('/signin');
         return;
       }
 
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || 'Transfer failed');
       }
 
@@ -164,6 +161,7 @@ export default function Dashboard() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Transfer failed');
       setLoading(false);
+    }
   };
 
   if (loading) {
