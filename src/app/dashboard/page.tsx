@@ -1,8 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { Card, CardContent } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Wallet, Menu } from "lucide-react";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button";
 
 interface User {
   id: string;
@@ -42,9 +47,9 @@ function TransferModal({ isOpen, onClose, recipient, onTransfer }: TransferModal
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 dark:border-gray-700">
+      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-card">
         <div className="mt-3">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+          <h3 className="text-lg font-medium">
             Send money to {recipient?.name}
           </h3>
           <form onSubmit={handleSubmit} className="mt-4">
@@ -60,7 +65,7 @@ function TransferModal({ isOpen, onClose, recipient, onTransfer }: TransferModal
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="Amount"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-primary focus:border-primary bg-background"
                 required
               />
             </div>
@@ -68,14 +73,14 @@ function TransferModal({ isOpen, onClose, recipient, onTransfer }: TransferModal
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md"
+                className="px-4 py-2 text-sm font-medium bg-secondary hover:bg-secondary/80 rounded-md"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md disabled:opacity-50"
               >
                 {loading ? 'Sending...' : 'Send Money'}
               </button>
@@ -169,64 +174,68 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
-        <div className="text-gray-600 dark:text-gray-300">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
 
+  const handleTransferClick = (user: User) => {
+    setSelectedUser(user);
+    setShowTransferModal(true);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="flex">
-        {/* Main Content - Balance Section */}
-        <div className="flex-1 py-12 px-4">
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg px-6 py-8">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Your Balance</h2>
-                <div className="text-5xl font-bold text-blue-600 dark:text-blue-400">
-                  ${balance.toFixed(2)}
-                </div>
-              </div>
-
-              {error && (
-                <div className="mt-4 rounded-md bg-red-50 dark:bg-red-900/50 p-4">
-                  <div className="text-sm text-red-700 dark:text-red-200">{error}</div>
-                </div>
-              )}
-            </div>
+    <SidebarProvider defaultOpen={false}>
+      <div className="min-h-screen flex w-full">
+        <DashboardSidebar 
+          users={users}
+          onTransferClick={handleTransferClick}
+        />
+        <SidebarInset>
+          {/* Split header controls: Sidebar Toggle on left, Theme Toggle on right */}
+          <div className="absolute top-4 left-4 z-50">
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+            >
+              <SidebarTrigger>
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle Sidebar</span>
+              </SidebarTrigger>
+            </Button>
           </div>
-        </div>
-
-        {/* Right Sidebar - Users Section */}
-        <div className="w-96 min-h-screen border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-y-auto">
-          <div className="p-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Users</h3>
-            <div className="space-y-4">
-              {users.map((user) => (
-                <div
-                  key={user.id}
-                  className="border dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow bg-white dark:bg-gray-700"
-                >
-                  <div className="font-medium text-gray-900 dark:text-white">{user.name}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
-                  <button
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setShowTransferModal(true);
-                    }}
-                    className="mt-2 w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md transition-colors"
-                  >
-                    Send Money
-                  </button>
-                </div>
-              ))}
-            </div>
+          <div className="absolute top-4 right-4 z-50">
+            <ThemeToggle />
           </div>
-        </div>
+
+          <div className="flex flex-col items-center justify-center w-full p-4 md:p-8">
+            {/* Japanese Pattern Overlay */}
+            <div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjAuNSIvPjwvc3ZnPg==')] pointer-events-none"></div>
+
+            {/* Balance Card */}
+            <Card className="w-full max-w-2xl backdrop-blur-lg bg-card/50 border-primary/20">
+              <CardContent className="p-8">
+                <div className="text-center space-y-4">
+                  <div className="inline-block p-3 rounded-full bg-primary/10 mb-4">
+                    <Wallet className="w-8 h-8 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-semibold text-muted-foreground">Your Balance</h2>
+                  <p className="text-6xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                    ${balance.toFixed(2)}
+                  </p>
+                  {error && (
+                    <div className="mt-4 p-4 rounded-md bg-destructive/10 text-destructive">
+                      {error}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </SidebarInset>
       </div>
-
-      <ThemeToggle />
 
       <TransferModal
         isOpen={showTransferModal}
@@ -237,6 +246,6 @@ export default function Dashboard() {
         recipient={selectedUser}
         onTransfer={handleTransfer}
       />
-    </div>
+    </SidebarProvider>
   );
 } 
