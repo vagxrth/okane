@@ -3,22 +3,11 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Wallet, Users } from "lucide-react";
-import { 
-  Sidebar, 
-  SidebarContent,
-  SidebarTrigger,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarProvider,
-  SidebarInset
-} from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Wallet, Menu } from "lucide-react";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button";
 
 interface User {
   id: string;
@@ -191,55 +180,32 @@ export default function Dashboard() {
     );
   }
 
-  const DashboardSidebar = () => (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <div className="flex items-center justify-between px-4 py-2">
-            <SidebarGroupLabel className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              <span>Users</span>
-            </SidebarGroupLabel>
-            <SidebarTrigger />
-          </div>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {users.map((user) => (
-                <SidebarMenuItem key={user.id}>
-                  <SidebarMenuButton 
-                    className="w-full"
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setShowTransferModal(true);
-                    }}
-                  >
-                    <div className="flex items-center gap-3 w-full">
-                      <Avatar className="w-8 h-8">
-                        <AvatarFallback>
-                          {user.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col items-start text-left">
-                        <span className="text-sm font-medium">{user.name}</span>
-                        <span className="text-xs text-muted-foreground">{user.email}</span>
-                      </div>
-                    </div>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
-  );
+  const handleTransferClick = (user: User) => {
+    setSelectedUser(user);
+    setShowTransferModal(true);
+  };
 
   return (
     <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full">
-        <DashboardSidebar />
+        <DashboardSidebar 
+          users={users}
+          onTransferClick={handleTransferClick}
+        />
         <SidebarInset>
-          {/* Theme Toggle */}
+          {/* Split header controls: Sidebar Toggle on left, Theme Toggle on right */}
+          <div className="absolute top-4 left-4 z-50">
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+            >
+              <SidebarTrigger>
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle Sidebar</span>
+              </SidebarTrigger>
+            </Button>
+          </div>
           <div className="absolute top-4 right-4 z-50">
             <ThemeToggle />
           </div>
