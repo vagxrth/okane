@@ -1,7 +1,6 @@
 import { 
     Sidebar, 
     SidebarContent,
-    SidebarTrigger,
     SidebarGroup,
     SidebarGroupLabel,
     SidebarGroupContent,
@@ -28,12 +27,11 @@ import {
       <Sidebar>
         <SidebarContent>
           <SidebarGroup>
-            <div className="flex items-center justify-between px-4 py-2">
+            <div className="flex items-center px-4 py-2">
               <SidebarGroupLabel className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
                 <span>Users</span>
               </SidebarGroupLabel>
-              <SidebarTrigger />
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
