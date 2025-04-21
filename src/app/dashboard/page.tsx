@@ -3,11 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Wallet, Menu } from "lucide-react";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useRouter } from 'next/navigation';
-import { Button } from "@/components/ui/button";
+import { Wallet } from "lucide-react";
 
 interface User {
   id: string;
@@ -187,44 +186,38 @@ export default function Dashboard() {
 
   return (
     <SidebarProvider defaultOpen={false}>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full justify-center relative bg-gradient-to-br from-[#9b87f5]/20 via-white/75 dark:via-[#23233c]/90 to-[#D6BCFA]/50">
         <DashboardSidebar 
           users={users}
           onTransferClick={handleTransferClick}
         />
         <SidebarInset>
-          {/* Split header controls: Sidebar Toggle on left, Theme Toggle on right */}
-          <div className="absolute top-4 left-4 z-50">
-            <Button
-              variant="ghost"
-              size="icon"
-              asChild
-            >
-              <SidebarTrigger>
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle Sidebar</span>
-              </SidebarTrigger>
-            </Button>
-          </div>
+          {/* Theme Toggle */}
           <div className="absolute top-4 right-4 z-50">
             <ThemeToggle />
           </div>
 
-          <div className="flex flex-col items-center justify-center w-full p-4 md:p-8">
+          <div className="flex flex-col items-center justify-center w-full min-h-[70vh] p-4 md:p-8 relative z-10">
             {/* Japanese Pattern Overlay */}
-            <div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjAuNSIvPjwvc3ZnPg==')] pointer-events-none"></div>
+            <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzk4ODlBOSIgc3Ryb2tlLXdpZHRoPSIwLjUiLz48L3N2Zz4=')]"></div>
 
             {/* Balance Card */}
-            <Card className="w-full max-w-2xl backdrop-blur-lg bg-card/50 border-primary/20">
-              <CardContent className="p-8">
+            <Card className="w-full max-w-2xl rounded-3xl glass-morphism border-primary/20 shadow-xl bg-white/70 dark:bg-[#23233c]/70">
+              <CardContent className="p-8 sm:p-10">
                 <div className="text-center space-y-4">
-                  <div className="inline-block p-3 rounded-full bg-primary/10 mb-4">
-                    <Wallet className="w-8 h-8 text-primary" />
+                  <div className="inline-block p-4 rounded-full bg-gradient-to-tr from-[#9b87f5]/70 to-[#7E69AB]/80 shadow-md mb-4">
+                    <Wallet className="w-9 h-9 text-white drop-shadow-glow" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-muted-foreground">Your Balance</h2>
-                  <p className="text-6xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                  <h2 className="font-japanese text-3xl font-extrabold text-gradient-primary tracking-tight">
+                    Your Balance
+                  </h2>
+                  <p className="text-6xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#7E69AB] to-[#D6BCFA] bg-clip-text text-transparent drop-shadow-xl font-japanese">
                     ${balance.toFixed(2)}
                   </p>
+                  <div className="mt-6 text-muted-foreground">
+                    Welcome to your beautiful dashboard ✨<br />
+                    Use the toggle on the left to send money to other users!
+                  </div>
                   {error && (
                     <div className="mt-4 p-4 rounded-md bg-destructive/10 text-destructive">
                       {error}
