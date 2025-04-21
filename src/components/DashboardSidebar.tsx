@@ -23,7 +23,7 @@ interface DashboardSidebarProps {
 }
   
 export const DashboardSidebar = ({ users, onTransferClick }: DashboardSidebarProps) => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   
   return (
     <>
