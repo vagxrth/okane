@@ -29,14 +29,17 @@ export const DashboardSidebar = ({ users, onTransferClick }: DashboardSidebarPro
       {/* Toggle Button */}
       <button
         className={clsx(
-          "fixed z-50 top-1/2 -translate-y-1/2 left-5 p-4 rounded-full shadow-xl glass-morphism bg-gradient-to-br from-primary/90 to-primary text-white",
-          "transition-all duration-300 hover:scale-110 ring-2 ring-primary/50 border-2 border-white/20",
+          "fixed z-50 top-1/2 -translate-y-1/2 left-5 p-3 rounded-full",
+          "transition-all duration-300 hover:scale-105 active:scale-95",
+          "bg-[#1e1e2d]/60 dark:bg-[#1e1e2d]/60 backdrop-blur-lg",
+          "border border-white/10 shadow-lg",
+          "text-white/70 hover:text-white"
         )}
         aria-label={open ? "Close user sidebar" : "Open user sidebar"}
         onClick={() => setOpen((v) => !v)}
-        style={{ boxShadow: "0 4px 16px 0 rgb(155 135 245 / 60%)" }}
+        style={{ boxShadow: "0 4px 16px 0 rgba(30, 30, 45, 0.25)" }}
       >
-        {open ? <ToggleLeft className="w-7 h-7" /> : <ToggleRight className="w-7 h-7" />}
+        {open ? <ToggleLeft className="w-5 h-5" /> : <ToggleRight className="w-5 h-5" />}
       </button>
   
       {/* Sidebar Overlay */}
