@@ -214,10 +214,6 @@ export default function Dashboard() {
                   <p className="text-6xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#7E69AB] to-[#D6BCFA] bg-clip-text text-transparent drop-shadow-xl font-japanese">
                     ${balance.toFixed(2)}
                   </p>
-                  <div className="mt-6 text-muted-foreground">
-                    Welcome to your beautiful dashboard ✨<br />
-                    Use the toggle on the left to send money to other users!
-                  </div>
                   {error && (
                     <div className="mt-4 p-4 rounded-md bg-destructive/10 text-destructive">
                       {error}
