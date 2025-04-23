@@ -6,7 +6,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useRouter } from 'next/navigation';
-import { Wallet } from "lucide-react";
+import { Wallet, CheckCircle2, AlertCircle } from "lucide-react";
 import { SendMoneyDialog } from "@/components/SendMoneyDialog";
 import { toast } from "sonner";
 
@@ -89,12 +89,16 @@ export default function Dashboard() {
       }
 
       await fetchDashboardData();
-      toast(`$${amount} sent to ${selectedUser.name}`, {
-        description: "Money sent successfully!"
+      
+      toast.success(`Sent $${amount} to ${selectedUser.name}`, {
+        duration: 4000,
+        icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />,
       });
     } catch (err) {
-      toast.error('Transfer failed', {
-        description: err instanceof Error ? err.message : 'An error occurred during transfer'
+      toast.error('Transfer Failed', {
+        description: err instanceof Error ? err.message : 'An error occurred during transfer',
+        duration: 5000,
+        icon: <AlertCircle className="w-5 h-5 text-red-400" />,
       });
     } finally {
       setLoading(false);
