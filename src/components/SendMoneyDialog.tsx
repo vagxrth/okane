@@ -9,23 +9,25 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, DollarSign } from "lucide-react";
-import { toast } from "sonner";
 
 interface SendMoneyDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   recipientName: string;
+  onSendMoney: (amount: string) => Promise<void>;
 }
 
-export const SendMoneyDialog = ({ open, onOpenChange, recipientName }: SendMoneyDialogProps) => {
+export const SendMoneyDialog = ({ open, onOpenChange, recipientName, onSendMoney }: SendMoneyDialogProps) => {
   const [amount, setAmount] = React.useState("");
 
-  const handleSendMoney = () => {
-    toast(`$${amount} sent to ${recipientName}`, {
-      description: "Money sent successfully!"
-    });
-    setAmount("");
-    onOpenChange(false);
+  const handleSendMoney = async () => {
+    try {
+      await onSendMoney(amount);
+      setAmount("");
+      onOpenChange(false);
+    } catch {
+      // Error handling is done in the parent component
+    }
   };
 
   return (

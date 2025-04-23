@@ -7,88 +7,13 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useRouter } from 'next/navigation';
 import { Wallet } from "lucide-react";
+import { SendMoneyDialog } from "@/components/SendMoneyDialog";
+import { toast } from "sonner";
 
 interface User {
   id: string;
   name: string;
   email: string;
-}
-
-interface TransferModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  recipient: User | null;
-  onTransfer: (amount: number) => Promise<void>;
-}
-
-function TransferModal({ isOpen, onClose, recipient, onTransfer }: TransferModalProps) {
-  const [amount, setAmount] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  if (!isOpen) return null;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      await onTransfer(Number(amount));
-      onClose();
-      setAmount('');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Transfer failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-card">
-        <div className="mt-3">
-          <h3 className="text-lg font-medium">
-            Send money to {recipient?.name}
-          </h3>
-          <form onSubmit={handleSubmit} className="mt-4">
-            {error && (
-              <div className="mb-4 text-sm text-red-600 dark:text-red-400">
-                {error}
-              </div>
-            )}
-            <div className="mt-2">
-              <input
-                type="number"
-                step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Amount"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-primary focus:border-primary bg-background"
-                required
-              />
-            </div>
-            <div className="mt-4 flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-sm font-medium bg-secondary hover:bg-secondary/80 rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md disabled:opacity-50"
-              >
-                {loading ? 'Sending...' : 'Send Money'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default function Dashboard() {
@@ -134,7 +59,7 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleTransfer = async (amount: number): Promise<void> => {
+  const handleTransfer = async (amount: string): Promise<void> => {
     if (!selectedUser) return;
 
     try {
@@ -148,7 +73,7 @@ export default function Dashboard() {
         },
         body: JSON.stringify({
           to: selectedUser.id,
-          amount,
+          amount: Number(amount),
         }),
         cache: 'no-store'
       });
@@ -164,8 +89,13 @@ export default function Dashboard() {
       }
 
       await fetchDashboardData();
+      toast(`$${amount} sent to ${selectedUser.name}`, {
+        description: "Money sent successfully!"
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Transfer failed');
+      toast.error('Transfer failed', {
+        description: err instanceof Error ? err.message : 'An error occurred during transfer'
+      });
     } finally {
       setLoading(false);
     }
@@ -226,14 +156,14 @@ export default function Dashboard() {
         </SidebarInset>
       </div>
 
-      <TransferModal
-        isOpen={showTransferModal}
-        onClose={() => {
-          setShowTransferModal(false);
-          setSelectedUser(null);
+      <SendMoneyDialog
+        open={showTransferModal}
+        onOpenChange={(open) => {
+          setShowTransferModal(open);
+          if (!open) setSelectedUser(null);
         }}
-        recipient={selectedUser}
-        onTransfer={handleTransfer}
+        recipientName={selectedUser?.name || ''}
+        onSendMoney={handleTransfer}
       />
     </SidebarProvider>
   );
