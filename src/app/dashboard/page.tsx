@@ -62,6 +62,16 @@ export default function Dashboard() {
   const handleTransfer = async (amount: string): Promise<void> => {
     if (!selectedUser) return;
 
+    const numAmount = Number(amount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      toast.error('Invalid Amount', {
+        description: 'Please enter a valid positive number',
+        duration: 5000,
+        icon: <AlertCircle className="w-5 h-5 text-red-400" />,
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');
@@ -73,7 +83,7 @@ export default function Dashboard() {
         },
         body: JSON.stringify({
           to: selectedUser.id,
-          amount: Number(amount),
+          amount: numAmount,
         }),
         cache: 'no-store'
       });
