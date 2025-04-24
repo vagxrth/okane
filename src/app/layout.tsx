@@ -8,6 +8,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "OKANE",
   description: "OKANE is a platform for transferring money between users.",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({
