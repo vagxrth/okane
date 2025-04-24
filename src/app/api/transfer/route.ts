@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { Account, connection } from '@/app/api/db';
+import { Account, Transaction, User, connection } from '@/app/api/db';
 import { parse } from 'cookie';
+import mongoose from 'mongoose';
 
 export async function POST(req: Request) {
   const session = await connection.startSession();
@@ -28,12 +29,16 @@ export async function POST(req: Request) {
     const { to, amount } = await req.json();
     const amountInPaise = Math.round(amount * 100); // Convert rupees to paise
 
-    // Find sender's account
-    const fromAccount = await Account.findOne({ userId: fromUserId }).session(session);
-    if (!fromAccount) {
+    // Find sender's account and user details
+    const [fromAccount, fromUser] = await Promise.all([
+      Account.findOne({ userId: fromUserId }).session(session),
+      User.findOne({ _id: fromUserId }).session(session)
+    ]);
+
+    if (!fromAccount || !fromUser) {
       await session.abortTransaction();
       return NextResponse.json(
-        { message: 'Invalid account' },
+        { message: 'Invalid sender account' },
         { status: 400 }
       );
     }
@@ -47,12 +52,16 @@ export async function POST(req: Request) {
       );
     }
 
-    // Find recipient's account
-    const toAccount = await Account.findOne({ userId: to }).session(session);
-    if (!toAccount) {
+    // Find recipient's account and user details
+    const [toAccount, toUser] = await Promise.all([
+      Account.findOne({ userId: to }).session(session),
+      User.findOne({ _id: to }).session(session)
+    ]);
+
+    if (!toAccount || !toUser) {
       await session.abortTransaction();
       return NextResponse.json(
-        { message: 'Invalid account' },
+        { message: 'Invalid recipient account' },
         { status: 400 }
       );
     }
@@ -61,8 +70,20 @@ export async function POST(req: Request) {
     fromAccount.balance -= amountInPaise;
     toAccount.balance += amountInPaise;
 
-    await fromAccount.save({ session });
-    await toAccount.save({ session });
+    await Promise.all([
+      fromAccount.save({ session }),
+      toAccount.save({ session })
+    ]);
+
+    // Record the transaction with proper user names
+    const transaction = new Transaction({
+      amount: amountInPaise,
+      senderId: new mongoose.Types.ObjectId(fromUserId),
+      senderName: fromUser.name,
+      receiverId: new mongoose.Types.ObjectId(to),
+      receiverName: toUser.name,
+    });
+    await transaction.save({ session });
 
     await session.commitTransaction();
 
@@ -75,7 +96,7 @@ export async function POST(req: Request) {
     await session.abortTransaction();
     console.error('Transfer error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   } finally {

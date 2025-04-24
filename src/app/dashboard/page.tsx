@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useRouter } from 'next/navigation';
-import { Wallet, CheckCircle2, AlertCircle } from "lucide-react";
+import { Wallet, CheckCircle2, AlertCircle, LogOut } from "lucide-react";
 import { SendMoneyDialog } from "@/components/SendMoneyDialog";
+import { TransactionHistory } from "@/components/TransactionHistory";
 import { toast } from "sonner";
 
 interface User {
@@ -115,6 +117,10 @@ export default function Dashboard() {
     }
   };
 
+  const handleSignOut = () => {
+    router.push('/');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -136,12 +142,20 @@ export default function Dashboard() {
           onTransferClick={handleTransferClick}
         />
         <SidebarInset>
-          {/* Theme Toggle */}
-          <div className="absolute top-4 right-4 z-50">
+          {/* Theme Toggle and Sign Out */}
+          <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-[#9b87f5]/10"
+              onClick={handleSignOut}
+            >
+              <LogOut className="h-5 w-5 text-[#7E69AB]" />
+            </Button>
             <ThemeToggle />
           </div>
 
-          <div className="flex flex-col items-center justify-center w-full min-h-[70vh] p-4 md:p-8 relative z-10">
+          <div className="flex flex-col items-center w-full p-4 md:p-8 relative z-10 gap-8">
             {/* Japanese Pattern Overlay */}
             <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzk4ODlBOSIgc3Ryb2tlLXdpZHRoPSIwLjUiLz48L3N2Zz4=')]"></div>
 
@@ -166,6 +180,9 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Transaction History */}
+            <TransactionHistory />
           </div>
         </SidebarInset>
       </div>
