@@ -28,7 +28,6 @@ const transactionSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Indexes
-userSchema.index({ email: 1 });
 accountSchema.index({ userId: 1 });
 transactionSchema.index({ senderId: 1, receiverId: 1 });
 transactionSchema.index({ createdAt: -1 });
@@ -47,7 +46,6 @@ const connectDB = async () => {
     }
 
     await mongoose.connect(MONGODB_URI);
-    console.log('Connected to MongoDB');
   } catch (error) {
     console.error('MongoDB connection error:', error);
     process.exit(1);

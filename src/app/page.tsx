@@ -29,7 +29,7 @@ export default function Home() {
         </h1>
         
         {/* English Subtitle */}
-        <p className="text-xl md:text-2xl text-muted-foreground mb-12">
+        <p className="text-xl md:text-2xl text-muted-foreground mb-6">
           Your Smart Financial Management Companion
         </p>
         
