@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useRouter } from 'next/navigation';
-import { Wallet, CheckCircle2, AlertCircle } from "lucide-react";
+import { Wallet, CheckCircle2, AlertCircle, LogOut } from "lucide-react";
 import { SendMoneyDialog } from "@/components/SendMoneyDialog";
 import { toast } from "sonner";
 
@@ -115,6 +116,10 @@ export default function Dashboard() {
     }
   };
 
+  const handleSignOut = () => {
+    router.push('/');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -136,8 +141,16 @@ export default function Dashboard() {
           onTransferClick={handleTransferClick}
         />
         <SidebarInset>
-          {/* Theme Toggle */}
-          <div className="absolute top-4 right-4 z-50">
+          {/* Theme Toggle and Sign Out */}
+          <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-[#9b87f5]/10"
+              onClick={handleSignOut}
+            >
+              <LogOut className="h-5 w-5 text-[#7E69AB]" />
+            </Button>
             <ThemeToggle />
           </div>
 
